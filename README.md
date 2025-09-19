@@ -1,13 +1,28 @@
 # 🔐 File Hash Generator & Verifier
 
-[![Build Status](https://github.com/mian196/file-hash-generator/actions/workflows/build-executables.yml/badge.svg)](https://github.com/mian196/file-hash-generator/actions)
-[![Release](https://img.shields.io/github/v/release/mian196/file-hash-generator)](https://github.com/mian196/file-hash-generator/releases)
+[![Build Status](https://github.com/mian196/Hash-Creator/actions/workflows/build.yml/badge.svg)](https://github.com/mian196/Hash-Creator/actions)
+[![Release](https://img.shields.io/github/v/release/mian196/Hash-Creator)](https://github.com/mian196/Hash-Creator/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](https://github.com/mian196/file-hash-generator/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](https://github.com/mian196/Hash-Creator/releases)
 
 A powerful, modern cross-platform application for generating and verifying file hashes with an intuitive GUI. Perfect for ensuring file integrity, detecting corruption, and security verification.
 
-![Application Screenshot](https://via.placeholder.com/800x500/2E86AB/FFFFFF?text=File+Hash+Generator+GUI)
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <b>Hash Generation Interface</b><br>
+      <img src="./Assets/Image1.PNG" width="400" alt="Hash Generation Tab"/><br>
+      <i>Modern GUI with algorithm selection and progress tracking</i>
+    </td>
+    <td width="50%" align="center">
+      <b>File Verification Interface</b><br>
+      <img src="./Assets/image2.PNG" width="400" alt="File Verification Tab"/><br>
+      <i>Comprehensive verification with corruption detection</i>
+    </td>
+  </tr>
+</table>
 
 ## ✨ Features
 
@@ -53,18 +68,18 @@ A powerful, modern cross-platform application for generating and verifying file 
 ## 🚀 Quick Start
 
 ### Option 1: Download Pre-built Executables (Recommended)
-1. Go to the [Releases](https://github.com/mian196/file-hash-generator/releases) page
+1. Go to the [Releases](https://github.com/mian196/Hash-Creator/releases) page
 2. Download the appropriate file for your platform:
-   - **Windows**: `file-hash-generator-windows.zip`
-   - **Linux**: `file-hash-generator-linux.tar.gz`
-   - **macOS**: `file-hash-generator-macos.tar.gz`
+   - **Windows**: `Hash-Creator-windows.zip`
+   - **Linux**: `Hash-Creator-linux.tar.gz`
+   - **macOS**: `Hash-Creator-macos.tar.gz`
 3. Extract and run - no installation required!
 
 ### Option 2: Run from Source
 ```bash
 # Clone the repository
-git clone https://github.com/mian196/file-hash-generator.git
-cd file-hash-generator
+git clone https://github.com/mian196/Hash-Creator.git
+cd Hash-Creator
 
 # Run platform-specific setup
 # Windows:
@@ -141,7 +156,7 @@ python main.py
 python build.py
 
 # Or manually with PyInstaller
-pyinstaller --onefile --windowed --name file-hash-generator main.py
+pyinstaller --onefile --windowed --name Hash-Creator main.py
 ```
 
 ## 🤖 Automated Builds
@@ -162,11 +177,11 @@ git push --tags
 ## 📂 Project Structure
 
 ```
-file-hash-generator/
+Hash-Creator/
 ├── main.py                    # Main application entry point
 ├── requirements.txt           # Python dependencies
 ├── build.py                   # Build script with icon generation
-├── file-hash-generator.spec   # PyInstaller configuration
+├── Hash-Creator.spec   # PyInstaller configuration
 ├── setup.bat                  # Windows setup script
 ├── setup.sh                   # Linux setup script
 ├── setup.command              # macOS setup script
@@ -218,8 +233,8 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 ## 📞 Support
 
-- **Bug Reports**: [GitHub Issues](https://github.com/mian196/file-hash-generator/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/mian196/file-hash-generator/discussions)
+- **Bug Reports**: [GitHub Issues](https://github.com/mian196/Hash-Creator/issues)
+- **Feature Requests**: [GitHub Discussions](https://github.com/mian196/Hash-Creator/discussions)
 - **Documentation**: This README and inline code comments
 - **Community**: Check existing issues for common questions
 
@@ -237,10 +252,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Stats
 
-![GitHub stars](https://img.shields.io/github/stars/mian196/file-hash-generator?style=social)
-![GitHub forks](https://img.shields.io/github/forks/mian196/file-hash-generator?style=social)
-![GitHub issues](https://img.shields.io/github/issues/mian196/file-hash-generator)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/mian196/file-hash-generator)
+![GitHub stars](https://img.shields.io/github/stars/mian196/Hash-Creator?style=social)
+![GitHub forks](https://img.shields.io/github/forks/mian196/Hash-Creator?style=social)
+![GitHub issues](https://img.shields.io/github/issues/mian196/Hash-Creator)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/mian196/Hash-Creator)
 
 ---
 
@@ -248,6 +263,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ for file integrity and security**
 
-[⭐ Star this repo](https://github.com/mian196/file-hash-generator) | [🐛 Report Bug](https://github.com/mian196/file-hash-generator/issues) | [💡 Request Feature](https://github.com/mian196/file-hash-generator/issues)
+[⭐ Star this repo](https://github.com/mian196/Hash-Creator) | [🐛 Report Bug](https://github.com/mian196/Hash-Creator/issues) | [💡 Request Feature](https://github.com/mian196/Hash-Creator/issues)
 
 </div>
