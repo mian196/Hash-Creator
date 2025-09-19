@@ -1,30 +1,4 @@
-- name: Create icon file (if not exists)
-      shell: bash
-      run: |
-        if [[ ! -f "icon.ico" && "${{ matrix.os }}" == "windows-latest" ]]; then
-          # Create a simple placeholder icon for Windows
-          echo "Creating placeholder icon..."
-          python -c "
-        try:
-            from PIL import Image, ImageDraw
-            # Create a simple 32x32 icon with hash symbol
-            img = Image.new('RGBA', (32, 32), (46, 134, 171, 255))
-            draw = ImageDraw.Draw(img)
-            # Draw simple hash pattern
-            draw.rectangle([8, 12, 24, 14], fill=(255, 255, 255, 255))
-            draw.rectangle([8, 18, 24, 20], fill=(255, 255, 255, 255))
-            draw.rectangle([12, 8, 14, 24], fill=(255, 255, 255, 255))
-            draw.rectangle([18, 8, 20, 24], fill=(255, 255, 255, 255))
-            img.save('icon.ico', format='ICO', sizes=[(32, 32)])
-            print('Icon created successfully')
-        except ImportError:
-            print('PIL not available, creating empty icon file')
-            open('icon.ico', 'w').close()
-        except Exception as e:
-            print(f'Error creating icon: {e}')
-            open('icon.ico', 'w').close()
-          "
-        finame: Build Cross-Platform Executables
+name: Build Cross-Platform Executables
 
 on:
   push:
@@ -82,7 +56,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        # Install PIL for icon creation
         pip install Pillow
 
     - name: Install platform-specific dependencies
@@ -100,9 +73,9 @@ jobs:
           echo "Creating basic README.md..."
           cat > README.md << 'EOF'
         # File Hash Generator & Verifier v2.0
-
+        
         A modern, cross-platform application for generating and verifying file hashes with a beautiful GUI.
-
+        
         ## Features
         - Support for multiple hash algorithms (MD5, SHA1, SHA-3, SHA256, SHA512, xxHash64, Blake2b, Blake3, CRC32)
         - Modern, intuitive GUI with real-time progress tracking
@@ -110,14 +83,14 @@ jobs:
         - Comprehensive error handling and corruption detection
         - Auto-save functionality with timestamped reports
         - Cross-platform compatibility (Windows, Linux, macOS)
-
+        
         ## Usage
         Simply run the executable - no Python installation required!
-
+        
         ## System Requirements
         - Windows 10+ (64-bit) / Linux (64-bit) / macOS 10.14+
         - No additional dependencies required
-
+        
         ## License
         This project is provided as-is for educational and practical use.
         EOF
@@ -125,18 +98,17 @@ jobs:
         else
           echo "README.md already exists"
         fi
+
+    - name: Create icon file (if not exists)
       shell: bash
       run: |
         if [[ ! -f "icon.ico" && "${{ matrix.os }}" == "windows-latest" ]]; then
-          # Create a simple placeholder icon for Windows
           echo "Creating placeholder icon..."
           python -c "
         try:
             from PIL import Image, ImageDraw
-            # Create a simple 32x32 icon with hash symbol
             img = Image.new('RGBA', (32, 32), (46, 134, 171, 255))
             draw = ImageDraw.Draw(img)
-            # Draw simple hash pattern
             draw.rectangle([8, 12, 24, 14], fill=(255, 255, 255, 255))
             draw.rectangle([8, 18, 24, 20], fill=(255, 255, 255, 255))
             draw.rectangle([12, 8, 14, 24], fill=(255, 255, 255, 255))
@@ -159,10 +131,8 @@ jobs:
         echo "Python version: $(python --version)"
         echo "Platform: $(python -c 'import platform; print(platform.platform())')"
         
-        # Run the matrix-specific build command
         ${{ matrix.build_command }}
         
-        # Verify the build succeeded
         if [ $? -ne 0 ]; then
           echo "Build command failed!"
           exit 1
@@ -187,7 +157,6 @@ jobs:
         if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "Windows executable created, skipping test run"
         else
-          # Test that the executable can start (will fail due to no display, but that's expected)
           timeout 10 ./${{ matrix.executable_name }} || echo "Expected failure due to no display"
         fi
 
@@ -198,10 +167,8 @@ jobs:
     - name: Prepare release files
       shell: bash
       run: |
-        # Copy executable
         cp "dist/${{ matrix.executable_name }}" release/
         
-        # Create README for this platform
         cat > release/README.txt << EOF
         File Hash Generator & Verifier v2.0
         ===================================
@@ -236,7 +203,6 @@ jobs:
         For issues or questions, please visit the project repository.
         EOF
         
-        # Create version info
         VERSION="${{ github.event.inputs.version || github.ref_name }}"
         echo "Version: $VERSION" > release/VERSION.txt
         echo "Build Date: $(date)" >> release/VERSION.txt
@@ -311,17 +277,17 @@ jobs:
         
         ### Windows
         - **file-hash-generator-windows.zip** - Windows executable (64-bit)
-        - Simply extract and run `file-hash-generator.exe`
+        - Simply extract and run \`file-hash-generator.exe\`
         
         ### Linux
         - **file-hash-generator-linux.tar.gz** - Linux executable (64-bit)
-        - Extract: `tar -xzf file-hash-generator-linux.tar.gz`
-        - Run: `./file-hash-generator`
+        - Extract: \`tar -xzf file-hash-generator-linux.tar.gz\`
+        - Run: \`./file-hash-generator\`
         
         ### macOS
         - **file-hash-generator-macos.tar.gz** - macOS executable (Universal)
-        - Extract: `tar -xzf file-hash-generator-macos.tar.gz`
-        - Run: `./file-hash-generator`
+        - Extract: \`tar -xzf file-hash-generator-macos.tar.gz\`
+        - Run: \`./file-hash-generator\`
         
         ## 🔧 System Requirements
         - **Windows:** Windows 10 or later (64-bit)
