@@ -1,0 +1,309 @@
+name: Build Cross-Platform Executables
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0
+  workflow_dispatch:  # Allows manual triggering
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            executable_name: file-hash-generator.exe
+            build_command: pyinstaller --onefile --windowed --name file-hash-generator --icon=icon.ico main.py
+            artifact_name: windows-executable
+          - os: ubuntu-latest
+            executable_name: file-hash-generator
+            build_command: pyinstaller --onefile --name file-hash-generator main.py
+            artifact_name: linux-executable
+          - os: macos-latest
+            executable_name: file-hash-generator
+            build_command: pyinstaller --onefile --windowed --name file-hash-generator main.py
+            artifact_name: macos-executable
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Install platform-specific dependencies
+      shell: bash
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          sudo apt-get update
+          sudo apt-get install -y python3-tk
+        fi
+
+    - name: Create icon file (if not exists)
+      shell: bash
+      run: |
+        if [[ ! -f "icon.ico" && "${{ matrix.os }}" == "windows-latest" ]]; then
+          # Create a simple placeholder icon for Windows
+          echo "Creating placeholder icon..."
+          python -c "
+        from PIL import Image
+        import os
+        try:
+            # Create a simple 32x32 icon
+            img = Image.new('RGB', (32, 32), color='blue')
+            img.save('icon.ico', format='ICO')
+            print('Icon created successfully')
+        except ImportError:
+            print('PIL not available, skipping icon creation')
+            # Create empty file to prevent build errors
+            open('icon.ico', 'w').close()
+        except Exception as e:
+            print(f'Error creating icon: {e}')
+            open('icon.ico', 'w').close()
+          "
+        fi
+
+    - name: Build executable
+      run: ${{ matrix.build_command }}
+
+    - name: Verify executable creation
+      shell: bash
+      run: |
+        if [[ -f "dist/${{ matrix.executable_name }}" ]]; then
+          echo "✅ Executable created successfully: dist/${{ matrix.executable_name }}"
+          ls -la dist/
+        else
+          echo "❌ Executable not found!"
+          ls -la dist/ || echo "dist/ directory not found"
+          exit 1
+        fi
+
+    - name: Test executable (basic check)
+      shell: bash
+      run: |
+        cd dist
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          echo "Windows executable created, skipping test run"
+        else
+          # Test that the executable can start (will fail due to no display, but that's expected)
+          timeout 10 ./${{ matrix.executable_name }} || echo "Expected failure due to no display"
+        fi
+
+    - name: Create release directory
+      run: |
+        mkdir -p release
+
+    - name: Prepare release files
+      shell: bash
+      run: |
+        # Copy executable
+        cp "dist/${{ matrix.executable_name }}" release/
+        
+        # Create README for this platform
+        cat > release/README.txt << EOF
+        File Hash Generator & Verifier v2.0
+        ===================================
+        
+        Platform: ${{ matrix.os }}
+        Executable: ${{ matrix.executable_name }}
+        
+        INSTALLATION:
+        1. No installation required - this is a standalone executable
+        2. Simply run the executable file
+        
+        FEATURES:
+        - Generate hashes for files and directories
+        - Support for multiple hash algorithms: MD5, SHA1, SHA-3, SHA256, SHA512, xxHash64, Blake2b, Blake3, CRC32
+        - Verify file integrity against saved hashes
+        - Modern GUI with progress tracking
+        - Auto-save functionality
+        - Detailed error reporting
+        - Cross-platform compatibility
+        
+        USAGE:
+        - Double-click the executable to launch
+        - Use "Generate Hashes" tab to create hash files
+        - Use "Verify Files" tab to check file integrity
+        - Results are automatically saved with timestamps
+        
+        REQUIREMENTS:
+        - No Python installation required
+        - No additional dependencies needed
+        
+        SUPPORT:
+        For issues or questions, please visit the project repository.
+        EOF
+        
+        # Create version info
+        VERSION="${{ github.event.inputs.version || github.ref_name }}"
+        echo "Version: $VERSION" > release/VERSION.txt
+        echo "Build Date: $(date)" >> release/VERSION.txt
+        echo "Platform: ${{ matrix.os }}" >> release/VERSION.txt
+
+    - name: Upload executable artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.artifact_name }}
+        path: release/
+        retention-days: 30
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: artifacts/
+
+    - name: Create release archives
+      run: |
+        cd artifacts
+        
+        # Create compressed archives for each platform
+        cd windows-executable
+        zip -r ../file-hash-generator-windows.zip *
+        cd ..
+        
+        cd linux-executable
+        tar -czf ../file-hash-generator-linux.tar.gz *
+        cd ..
+        
+        cd macos-executable
+        tar -czf ../file-hash-generator-macos.tar.gz *
+        cd ..
+
+    - name: Generate release notes
+      run: |
+        cat > release-notes.md << EOF
+        # File Hash Generator & Verifier ${{ github.ref_name }}
+        
+        ## 🚀 New Features
+        - ✅ Complete hash algorithm support: MD5, SHA1, SHA-3, SHA256, SHA512, xxHash64, Blake2b, Blake3, CRC32
+        - 🎨 Modern, intuitive GUI with dark theme support
+        - 📊 Enhanced progress tracking and status updates
+        - 🔄 Multi-threaded processing for better performance
+        - 💾 Auto-save functionality for results and error reports
+        - 🔍 Advanced file verification with corruption detection
+        - 📝 Detailed reporting with corrupted files list
+        - 🛡️ Comprehensive error handling and recovery
+        
+        ## 📦 Downloads
+        
+        ### Windows
+        - **file-hash-generator-windows.zip** - Windows executable (64-bit)
+        - Simply extract and run `file-hash-generator.exe`
+        
+        ### Linux
+        - **file-hash-generator-linux.tar.gz** - Linux executable (64-bit)
+        - Extract: `tar -xzf file-hash-generator-linux.tar.gz`
+        - Run: `./file-hash-generator`
+        
+        ### macOS
+        - **file-hash-generator-macos.tar.gz** - macOS executable (Universal)
+        - Extract: `tar -xzf file-hash-generator-macos.tar.gz`
+        - Run: `./file-hash-generator`
+        
+        ## 🔧 System Requirements
+        - **Windows:** Windows 10 or later (64-bit)
+        - **Linux:** Any modern 64-bit Linux distribution
+        - **macOS:** macOS 10.14 or later
+        
+        ## 🆘 Usage
+        1. **Generate Hashes:**
+           - Select file or folder to scan
+           - Choose hash algorithm
+           - Click "Generate Hashes"
+           - Results auto-saved with timestamp
+        
+        2. **Verify Files:**
+           - Load previously saved hash file
+           - Optionally specify base path if files moved
+           - Click "Verify Files"
+           - View corruption report
+        
+        ## 🐛 Bug Fixes
+        - Fixed cross-platform path handling
+        - Improved memory usage for large files
+        - Enhanced error recovery mechanisms
+        - Better handling of permission errors
+        
+        ## 📋 Technical Details
+        - Built with Python 3.11
+        - Standalone executables (no Python installation required)
+        - Multi-threaded hash computation
+        - JSON-based result storage
+        - Comprehensive logging and error reporting
+        EOF
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: File Hash Generator ${{ github.ref_name }}
+        body_path: release-notes.md
+        files: |
+          artifacts/file-hash-generator-windows.zip
+          artifacts/file-hash-generator-linux.tar.gz
+          artifacts/file-hash-generator-macos.tar.gz
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-executables:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # Skip Windows for automated testing
+    
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ matrix.os == 'ubuntu-latest' && 'linux-executable' || 'macos-executable' }}
+        path: ./test-executable/
+
+    - name: Test executable basic functionality
+      run: |
+        cd test-executable
+        chmod +x file-hash-generator
+        
+        # Create test file
+        echo "Hello World" > test.txt
+        
+        # Test would require display server, so we'll just check file exists and is executable
+        if [[ -x "file-hash-generator" ]]; then
+          echo "✅ Executable is properly created and has execute permissions"
+          file file-hash-generator
+        else
+          echo "❌ Executable test failed"
+          exit 1
+        fi

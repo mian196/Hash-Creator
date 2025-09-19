@@ -1,0 +1,8 @@
+xxhash
+blake3
+pyinstaller
+auto-py-to-exe
+pytest
+pytest-cov
+black
+flake8
