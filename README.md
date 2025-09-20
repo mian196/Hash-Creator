@@ -159,14 +159,6 @@ python build.py
 pyinstaller --onefile --windowed --name Hash-Creator main.py
 ```
 
-## 🤖 Automated Builds
-
-This project uses GitHub Actions for automated cross-platform builds:
-
-- **Triggered by**: Version tags (`v1.0.0`) or manual dispatch
-- **Builds for**: Windows, Linux, and macOS
-- **Output**: Ready-to-use executables in GitHub Releases
-- **Quality**: Automated testing and verification
 
 ### Creating a Release
 ```bash
@@ -193,14 +185,6 @@ Hash-Creator/
 └── venv/                      # Virtual environment (generated)
 ```
 
-## 🔒 Security & Privacy
-
-- **Local Processing**: All operations performed locally on your machine
-- **No Data Collection**: No telemetry or data sent to external servers
-- **Open Source**: Full source code available for audit
-- **Cryptographic Standards**: Uses well-established hash algorithms
-- **Secure Defaults**: SHA256 selected as default algorithm
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
@@ -214,33 +198,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 6. Push to the branch (`git push origin feature/AmazingFeature`)
 7. Open a Pull Request
 
-## 📋 Roadmap
 
-- [ ] **Batch Processing**: Queue multiple folders for processing
-- [ ] **Hash Comparison**: Direct comparison between two files
-- [ ] **Scheduled Verification**: Automatic periodic integrity checks
-- [ ] **Cloud Integration**: Support for cloud storage platforms
-- [ ] **Plugin System**: Custom hash algorithms
-- [ ] **Command Line Interface**: Headless operation support
-- [ ] **Database Storage**: SQLite backend for large datasets
-- [ ] **Incremental Hashing**: Only hash changed files
-
-## 🐛 Known Issues
-
-- **Display Issues**: GUI may not work properly via SSH without X11 forwarding
-- **Large Files**: Very large files (>10GB) may take significant time to process
-- **Network Drives**: Performance may be reduced on network-mounted drives
-
-## 📞 Support
-
-- **Bug Reports**: [GitHub Issues](https://github.com/mian196/Hash-Creator/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/mian196/Hash-Creator/discussions)
-- **Documentation**: This README and inline code comments
-- **Community**: Check existing issues for common questions
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
